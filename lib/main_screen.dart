@@ -11,11 +11,21 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   Future<void> getData() async {
     //Get data from api
+    try {
+      Response response = await Dio().get(
+          "https://fir-demo-a449f-default-rtdb.firebaseio.kodsk/bucketlist.json");
 
-    Response response = await Dio().get(
-        "https://fir-demo-a449f-default-rtdb.firebaseio.com/bucketlist.json");
-
-    print(response.data);
+      print(response.data);
+    } catch (e) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                  'Cannot connect to server. Please try after few seconds'),
+            );
+          });
+    }
   }
 
   @override
