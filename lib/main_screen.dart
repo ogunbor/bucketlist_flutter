@@ -10,21 +10,27 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<dynamic> bucketListData = [];
+  bool isLoading = false;
 
   Future<void> getData() async {
+    setState(() {
+      isLoading = true;
+    });
     //Get data from api
     try {
       Response response = await Dio().get(
           "https://fir-demo-a449f-default-rtdb.firebaseio.com/bucketlist.json");
 
       bucketListData = response.data;
-
+      isLoading = false;
       setState(() {});
     } catch (e) {
+      isLoading = false;
+      setState(() {});
       showDialog(
           context: context,
           builder: (context) {
-            return AlertDialog(
+            return const AlertDialog(
               title: Text(
                   'Cannot connect to server. Please try after few seconds'),
             );
@@ -33,16 +39,37 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bucket List'),
+        actions: [
+          InkWell(
+              onTap: getData,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.refresh),
+              ))
+        ],
       ),
-      body: Column(
-        children: [
-          ElevatedButton(onPressed: getData, child: Text('Get Data')),
-          Expanded(
-            child: ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getData();
+        },
+        child: isLoading
+            ? const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            : ListView.builder(
                 itemCount: bucketListData.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
@@ -59,8 +86,6 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }),
-          )
-        ],
       ),
     );
   }
