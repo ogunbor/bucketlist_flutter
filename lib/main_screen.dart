@@ -9,13 +9,17 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  List<dynamic> bucketListData = [];
+
   Future<void> getData() async {
     //Get data from api
     try {
       Response response = await Dio().get(
-          "https://fir-demo-a449f-default-rtdb.firebaseio.kodsk/bucketlist.json");
+          "https://fir-demo-a449f-default-rtdb.firebaseio.com/bucketlist.json");
 
-      print(response.data);
+      bucketListData = response.data;
+
+      setState(() {});
     } catch (e) {
       showDialog(
           context: context,
@@ -34,7 +38,30 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text('Bucket List'),
       ),
-      body: ElevatedButton(onPressed: getData, child: Text('Get Data')),
+      body: Column(
+        children: [
+          ElevatedButton(onPressed: getData, child: Text('Get Data')),
+          Expanded(
+            child: ListView.builder(
+                itemCount: bucketListData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 25,
+                        backgroundImage:
+                            NetworkImage(bucketListData[index]['image'] ?? ""),
+                      ),
+                      title: Text(bucketListData[index]['item'] ?? ""),
+                      trailing:
+                          Text(bucketListData[index]['cost'].toString() ?? ""),
+                    ),
+                  );
+                }),
+          )
+        ],
+      ),
     );
   }
 }
