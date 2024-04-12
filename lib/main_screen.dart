@@ -24,7 +24,12 @@ class _MainScreenState extends State<MainScreen> {
       Response response = await Dio().get(
           "https://fir-demo-a449f-default-rtdb.firebaseio.com/bucketlist.json");
 
-      bucketListData = response.data;
+      if (response.data is List) {
+        bucketListData = response.data;
+      } else {
+        bucketListData = [];
+      }
+
       isLoading = false;
       isError = false;
       setState(() {});
@@ -117,7 +122,9 @@ class _MainScreenState extends State<MainScreen> {
                 )
               : isError
                   ? errorWidget(errorText: "Error connecting...")
-                  : listDataWidget()),
+                  : bucketListData.length < 1
+                      ? Center(child: Text("No data on bucketlist"))
+                      : listDataWidget()),
     );
   }
 }
