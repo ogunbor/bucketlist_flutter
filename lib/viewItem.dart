@@ -22,7 +22,17 @@ class _ViewItemScreenState extends State<ViewItemScreen> {
     try {
       Response response = await Dio().delete(
           "https://fir-demo-a449f-default-rtdb.firebaseio.com/bucketlist/${widget.index}.json");
-      Navigator.pop(context);
+      Navigator.pop(context, "refresh");
+    } catch (e) {}
+  }
+
+  Future<void> markAsComplete() async {
+    try {
+      Map<String, dynamic> data = {"completed": true};
+      Response response = await Dio().patch(
+          "https://fir-demo-a449f-default-rtdb.firebaseio.com/bucketlist/${widget.index}.json",
+          data: data);
+      Navigator.pop(context, "refresh");
     } catch (e) {}
   }
 
@@ -48,6 +58,10 @@ class _ViewItemScreenState extends State<ViewItemScreen> {
                       ],
                     );
                   });
+            }
+
+            if (value == 2) {
+              markAsComplete();
             }
           }, itemBuilder: (context) {
             return [
