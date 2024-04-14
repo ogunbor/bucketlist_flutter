@@ -65,16 +65,16 @@ class _MainScreenState extends State<MainScreen> {
         .where((element) => !(element?["completed"] ?? false))
         .toList();
 
-    return filteredList.length < 1
+    return filteredList.isEmpty
         ? Center(child: Text("No data on bucketlist"))
         : ListView.builder(
             itemCount: bucketListData.length,
             itemBuilder: (BuildContext context, int index) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: (bucketListData[index] is Map &&
-                        (!(bucketListData[index]?["completed"] ?? false)))
-                    ? ListTile(
+              return (bucketListData[index] is Map &&
+                      (!(bucketListData[index]?["completed"] ?? false)))
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
                         onTap: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
@@ -96,9 +96,9 @@ class _MainScreenState extends State<MainScreen> {
                         title: Text(bucketListData[index]?['item'] ?? ""),
                         trailing: Text(
                             bucketListData[index]?['cost'].toString() ?? ""),
-                      )
-                    : SizedBox(),
-              );
+                      ),
+                    )
+                  : SizedBox();
             });
   }
 
@@ -108,8 +108,12 @@ class _MainScreenState extends State<MainScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return AddBucketListScreen();
-          }));
+            return AddBucketListScreen(newIndex: bucketListData.length);
+          })).then((value) {
+            if (value == "refresh") {
+              getData();
+            }
+          });
         },
         shape: CircleBorder(),
         child: const Icon(Icons.add),
