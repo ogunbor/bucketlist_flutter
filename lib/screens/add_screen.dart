@@ -90,7 +90,9 @@ class _AddBucketListScreenState extends State<AddBucketListScreen> {
                     Expanded(
                         child: ElevatedButton(
                             onPressed: () {
-                              if (addForm.currentState!.validate()) {}
+                              if (addForm.currentState!.validate()) {
+                                addData();
+                              }
                             },
                             child: Text("Add data"))),
                   ],
